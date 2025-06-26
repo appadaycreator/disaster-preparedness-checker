@@ -4,5 +4,6 @@
 
 - **index.html**: ユーザーインターフェースを提供するHTMLファイル。
 - **manifest.json**: PWA用の設定ファイル。
+- Google Tag Manager を用いたアクセス解析。
 
 特別なサーバーやビルド工程は不要で、ブラウザで `index.html` を開くだけで利用できます。
