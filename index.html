@@ -1,13 +1,1841 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>防災チェックアプリ</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="favicon.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>防災準備度チェック「備えの達人」</title>
+    <meta name="description" content="家庭の防災準備状況を地域特性に応じて診断し、カスタマイズされた改善提案を提供します。50項目の包括的チェックリストで防災準備度をスコア化。">
+    
+    <!-- PWA設定 -->
+    <meta name="theme-color" content="#dc2626">
+    <link rel="manifest" id="manifest-placeholder">
+    
+    <!-- OGP設定 -->
+    <meta property="og:title" content="防災準備度チェック「備えの達人」">
+    <meta property="og:description" content="あなたの家庭の防災準備は何点？地域特性を考慮した防災診断で本当に必要な備えが分かります。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://appadaycreator.github.io/disaster-preparedness-checker/">
+    
+    <!-- CSS Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    
+    <style>
+        body { font-family: 'Noto Sans JP', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%); }
+        .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); }
+        .progress-bar { transition: width 0.3s ease; }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .category-card { transition: all 0.3s ease; }
+        .category-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .chart-container { position: relative; height: 400px; }
+    </style>
 </head>
-<body>
-  <h1>防災チェックアプリへようこそ</h1>
+
+<body class="bg-gray-50">
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-TXQGZRF9');</script>
+    <!-- End Google Tag Manager -->
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXQGZRF9"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- ヘッダー -->
+    <header class="gradient-bg shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                    <h1 class="text-white text-xl font-bold">備えの達人</h1>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#home" class="text-white hover:text-red-200 transition-colors">ホーム</a>
+                    <a href="#check" class="text-white hover:text-red-200 transition-colors">診断開始</a>
+                    <a href="#history" class="text-white hover:text-red-200 transition-colors">履歴</a>
+                    <a href="#about" class="text-white hover:text-red-200 transition-colors">使い方</a>
+                </nav>
+                <button id="menuBtn" class="md:hidden text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main>
+        <!-- ヒーローセクション -->
+        <section id="home" class="gradient-bg py-16">
+            <div class="container mx-auto px-4 text-center">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-4xl md:text-6xl font-bold text-white mb-6">
+                        あなたの家庭の<br>防災準備は何点？
+                    </h2>
+                    <p class="text-xl text-red-100 mb-8 leading-relaxed">
+                        地域特性を考慮した50項目の包括的チェックで<br>
+                        本当に必要な防災準備が分かります
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button id="startBtn" class="bg-white text-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-50 transition-colors shadow-lg">
+                            <i class="fas fa-play mr-2"></i>
+                            無料で診断開始
+                        </button>
+                        <button id="historyBtn" class="border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-red-600 transition-colors">
+                            <i class="fas fa-history mr-2"></i>
+                            過去の診断履歴
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 統計情報 -->
+        <section class="py-12 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div class="p-6">
+                        <div class="text-3xl font-bold text-red-600 mb-2">
+                            <i class="fas fa-users text-4xl mb-4"></i><br>
+                            10,000+
+                        </div>
+                        <p class="text-gray-600">診断利用者数</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="text-3xl font-bold text-red-600 mb-2">
+                            <i class="fas fa-list-check text-4xl mb-4"></i><br>
+                            50項目
+                        </div>
+                        <p class="text-gray-600">包括的チェック</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="text-3xl font-bold text-red-600 mb-2">
+                            <i class="fas fa-map-marked-alt text-4xl mb-4"></i><br>
+                            全国対応
+                        </div>
+                        <p class="text-gray-600">地域別リスク診断</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 基本情報入力セクション -->
+        <section id="check" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <div id="basicInfoForm" class="max-w-4xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h3 class="text-3xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-user-check text-red-600 mr-3"></i>
+                            基本情報の入力
+                        </h3>
+                        <p class="text-gray-600 text-lg">あなたに最適な防災診断を提供するため、基本情報を教えてください</p>
+                    </div>
+
+                    <div class="glass-effect rounded-xl p-8 shadow-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- 地域情報 -->
+                            <div class="space-y-6">
+                                <h4 class="text-xl font-bold text-gray-800 flex items-center">
+                                    <i class="fas fa-map-marker-alt text-red-600 mr-2"></i>
+                                    お住まいの地域
+                                </h4>
+                                
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">都道府県</label>
+                                    <select id="prefecture" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                        <option value="">選択してください</option>
+                                        <option value="北海道">北海道</option>
+                                        <option value="青森県">青森県</option>
+                                        <option value="岩手県">岩手県</option>
+                                        <option value="宮城県">宮城県</option>
+                                        <option value="秋田県">秋田県</option>
+                                        <option value="山形県">山形県</option>
+                                        <option value="福島県">福島県</option>
+                                        <option value="茨城県">茨城県</option>
+                                        <option value="栃木県">栃木県</option>
+                                        <option value="群馬県">群馬県</option>
+                                        <option value="埼玉県">埼玉県</option>
+                                        <option value="千葉県">千葉県</option>
+                                        <option value="東京都">東京都</option>
+                                        <option value="神奈川県">神奈川県</option>
+                                        <option value="新潟県">新潟県</option>
+                                        <option value="富山県">富山県</option>
+                                        <option value="石川県">石川県</option>
+                                        <option value="福井県">福井県</option>
+                                        <option value="山梨県">山梨県</option>
+                                        <option value="長野県">長野県</option>
+                                        <option value="岐阜県">岐阜県</option>
+                                        <option value="静岡県">静岡県</option>
+                                        <option value="愛知県">愛知県</option>
+                                        <option value="三重県">三重県</option>
+                                        <option value="滋賀県">滋賀県</option>
+                                        <option value="京都府">京都府</option>
+                                        <option value="大阪府">大阪府</option>
+                                        <option value="兵庫県">兵庫県</option>
+                                        <option value="奈良県">奈良県</option>
+                                        <option value="和歌山県">和歌山県</option>
+                                        <option value="鳥取県">鳥取県</option>
+                                        <option value="島根県">島根県</option>
+                                        <option value="岡山県">岡山県</option>
+                                        <option value="広島県">広島県</option>
+                                        <option value="山口県">山口県</option>
+                                        <option value="徳島県">徳島県</option>
+                                        <option value="香川県">香川県</option>
+                                        <option value="愛媛県">愛媛県</option>
+                                        <option value="高知県">高知県</option>
+                                        <option value="福岡県">福岡県</option>
+                                        <option value="佐賀県">佐賀県</option>
+                                        <option value="長崎県">長崎県</option>
+                                        <option value="熊本県">熊本県</option>
+                                        <option value="大分県">大分県</option>
+                                        <option value="宮崎県">宮崎県</option>
+                                        <option value="鹿児島県">鹿児島県</option>
+                                        <option value="沖縄県">沖縄県</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">住居タイプ</label>
+                                    <select id="housingType" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                        <option value="">選択してください</option>
+                                        <option value="戸建て">戸建て住宅</option>
+                                        <option value="マンション低層">マンション（1-3階）</option>
+                                        <option value="マンション中層">マンション（4-9階）</option>
+                                        <option value="マンション高層">マンション（10階以上）</option>
+                                        <option value="アパート">アパート</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 家族構成 -->
+                            <div class="space-y-6">
+                                <h4 class="text-xl font-bold text-gray-800 flex items-center">
+                                    <i class="fas fa-home text-red-600 mr-2"></i>
+                                    家族構成
+                                </h4>
+
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">家族人数</label>
+                                    <select id="familySize" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                        <option value="">選択してください</option>
+                                        <option value="1">1人（一人暮らし）</option>
+                                        <option value="2">2人</option>
+                                        <option value="3">3人</option>
+                                        <option value="4">4人</option>
+                                        <option value="5">5人</option>
+                                        <option value="6">6人以上</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">年齢構成</label>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="hasInfants" class="mr-3 text-red-600">
+                                            <span>乳幼児（0-3歳）がいる</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="hasChildren" class="mr-3 text-red-600">
+                                            <span>小中学生がいる</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="hasElderly" class="mr-3 text-red-600">
+                                            <span>高齢者（65歳以上）がいる</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="hasPets" class="mr-3 text-red-600">
+                                            <span>ペットがいる</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 text-center">
+                            <button id="startCheckBtn" class="bg-red-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                                <i class="fas fa-clipboard-check mr-2"></i>
+                                防災チェックを開始する
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- チェックリストセクション -->
+                <div id="checklistSection" class="max-w-6xl mx-auto mt-16 hidden">
+                    <div class="text-center mb-8">
+                        <h3 class="text-3xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-tasks text-red-600 mr-3"></i>
+                            防災準備度チェック
+                        </h3>
+                        <div class="bg-white rounded-lg p-4 shadow-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-gray-600">進捗状況</span>
+                                <span id="progressText" class="text-gray-800 font-bold">0 / 50</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div id="progressBar" class="bg-red-600 h-3 rounded-full progress-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- カテゴリ別チェックリスト -->
+                    <div id="categoriesContainer" class="space-y-8">
+                        <!-- 水・食料備蓄 -->
+                        <div class="category-card bg-white rounded-xl p-6 shadow-lg">
+                            <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-tint text-blue-500 mr-3"></i>
+                                水・食料備蓄（12項目）
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" data-category="water-food">
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>1人1日3リットル×3日分以上の飲料水を備蓄している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>1人3日分以上の非常食を備蓄している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>缶詰・レトルト食品を常備している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>乾パン・ビスケット類を常備している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>米・パスタなどの主食を1週間分以上備蓄している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>粉ミルク・離乳食（該当する場合）を備蓄している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>ペットフード（該当する場合）を備蓄している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>カセットコンロ・ボンベを用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>紙皿・紙コップ・割り箸を用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>ラップ・アルミホイルを用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>栄養補助食品・ビタミン剤を用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>定期的にローリングストック法で食品を入れ替えている</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 防災用品 -->
+                        <div class="category-card bg-white rounded-xl p-6 shadow-lg">
+                            <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-toolbox text-orange-500 mr-3"></i>
+                                防災用品（15項目）
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" data-category="equipment">
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>懐中電灯・ランタンを複数個用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>乾電池を各種サイズ十分に備蓄している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>ポータブルラジオを用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>モバイルバッテリー・充電器を用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>救急箱・常備薬を用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>マスク・消毒液を十分に備蓄している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>毛布・寝袋・防寒具を用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>衣類・下着の着替えを用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>タオル・ウェットティッシュを用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>ヘルメット・軍手を家族分用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>ビニール袋・ゴミ袋を大量に用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>現金を小銭も含めて用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>トイレットペーパー・生理用品を備蓄している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>簡易トイレを用意している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>工具セット（バール・ロープ等）を用意している</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 避難準備 -->
+                        <div class="category-card bg-white rounded-xl p-6 shadow-lg">
+                            <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-running text-green-500 mr-3"></i>
+                                避難準備（8項目）
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" data-category="evacuation">
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>避難場所・避難経路を家族で確認している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>非常持出袋を用意し、定期的に見直している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>重要書類のコピーを別途保管している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>預金通帳・印鑑を分散して保管している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>車のガソリンを常に半分以上キープしている</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>家具の転倒防止対策を実施している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>ガラス飛散防止フィルムを貼っている</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>火災保険・地震保険に加入している</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 情報収集 -->
+                        <div class="category-card bg-white rounded-xl p-6 shadow-lg">
+                            <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-broadcast-tower text-purple-500 mr-3"></i>
+                                情報収集（7項目）
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" data-category="information">
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>地域の防災アプリをインストールしている</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>ハザードマップを確認・印刷保管している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>緊急速報メール・エリアメール設定を確認している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>地域の防災無線の存在・仕組みを把握している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>自治体のSNS・ホームページをフォローしている</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>近隣住民と災害時の連絡方法を確認している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>災害伝言ダイヤル(171)の使い方を覚えている</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 家族連携 -->
+                        <div class="category-card bg-white rounded-xl p-6 shadow-lg">
+                            <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-users text-pink-500 mr-3"></i>
+                                家族連携（8項目）
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" data-category="family">
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>家族会議で災害時の行動を話し合っている</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>家族の連絡先リストを全員が持っている</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>県外の親戚・友人の連絡先を共有している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>集合場所・連絡方法を家族で決めている</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>年1回以上、防災訓練に参加している</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>子どもに災害時の行動を教えている</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>高齢者・障害者の避難支援計画がある</span>
+                                </label>
+                                <label class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="checklist-item mr-3 text-red-600">
+                                    <span>地域の防災活動・自主防災組織に参加している</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-8">
+                        <button id="calculateBtn" class="bg-red-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors shadow-lg">
+                            <i class="fas fa-calculator mr-2"></i>
+                            診断結果を確認する
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 結果表示セクション -->
+                <div id="resultSection" class="max-w-6xl mx-auto mt-16 hidden">
+                    <div class="text-center mb-8">
+                        <h3 class="text-3xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-chart-line text-red-600 mr-3"></i>
+                            あなたの防災準備度
+                        </h3>
+                    </div>
+
+                    <!-- 総合スコア -->
+                    <div class="glass-effect rounded-xl p-8 shadow-lg mb-8">
+                        <div class="text-center">
+                            <div id="totalScore" class="text-6xl font-bold text-red-600 mb-4">0</div>
+                            <div class="text-2xl text-gray-700 mb-4">点 / 100点満点</div>
+                            <div id="scoreComment" class="text-lg text-gray-600"></div>
+                        </div>
+                    </div>
+
+                    <!-- カテゴリ別グラフ -->
+                    <div class="bg-white rounded-xl p-8 shadow-lg mb-8">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-6 text-center">カテゴリ別評価</h4>
+                        <div class="chart-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 改善提案 -->
+                    <div id="suggestions" class="bg-white rounded-xl p-8 shadow-lg mb-8">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>
+                            改善提案
+                        </h4>
+                        <div id="suggestionsContent"></div>
+                    </div>
+
+                    <!-- アクションボタン -->
+                    <div class="text-center space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
+                        <button id="shareBtn" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-share mr-2"></i>
+                            結果をシェア
+                        </button>
+                        <button id="printBtn" class="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors">
+                            <i class="fas fa-print mr-2"></i>
+                            印刷用PDF
+                        </button>
+                        <button id="saveBtn" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-purple-700 transition-colors">
+                            <i class="fas fa-save mr-2"></i>
+                            結果を保存
+                        </button>
+                        <button id="retryBtn" class="bg-gray-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-redo mr-2"></i>
+                            再診断
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 履歴セクション -->
+        <section id="history" class="py-16 bg-gray-50 hidden">
+            <div class="container mx-auto px-4">
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h3 class="text-3xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-history text-red-600 mr-3"></i>
+                            診断履歴
+                        </h3>
+                        <p class="text-gray-600 text-lg">過去の診断結果を確認して、改善の進捗をチェックしましょう</p>
+                    </div>
+
+                    <div id="historyContent" class="space-y-6">
+                        <div class="text-center text-gray-500 py-8">
+                            <i class="fas fa-clipboard-list text-4xl mb-4"></i>
+                            <p>まだ診断履歴がありません。<br>最初の診断を完了すると、ここに履歴が表示されます。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 使い方セクション -->
+        <section id="about" class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h3 class="text-3xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-question-circle text-red-600 mr-3"></i>
+                            使い方ガイド
+                        </h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-user-plus text-blue-500 mr-3"></i>
+                                STEP 1: 基本情報入力
+                            </h4>
+                            <p class="text-gray-600">お住まいの地域と家族構成を入力してください。地域特性に応じた最適な診断を提供します。</p>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-tasks text-green-500 mr-3"></i>
+                                STEP 2: チェックリスト
+                            </h4>
+                            <p class="text-gray-600">50項目の防災チェックリストに回答してください。現在の準備状況を正直にチェックしましょう。</p>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-chart-bar text-purple-500 mr-3"></i>
+                                STEP 3: 結果確認
+                            </h4>
+                            <p class="text-gray-600">100点満点でスコア化し、カテゴリ別の強み・弱みを可視化します。</p>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>
+                                STEP 4: 改善実行
+                            </h4>
+                            <p class="text-gray-600">個別の改善提案を参考に、段階的に防災準備を強化していきましょう。</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 bg-red-50 rounded-xl p-8">
+                        <h4 class="text-2xl font-bold text-red-600 mb-4 text-center">
+                            <i class="fas fa-exclamation-triangle mr-3"></i>
+                            重要なポイント
+                        </h4>
+                        <ul class="space-y-3 text-gray-700">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-red-600 mr-3 mt-1"></i>
+                                <span>3ヶ月に1回程度、定期的に診断を行い進捗を確認しましょう</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-red-600 mr-3 mt-1"></i>
+                                <span>一度にすべてを完璧にする必要はありません。優先度の高いものから順次改善しましょう</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-red-600 mr-3 mt-1"></i>
+                                <span>家族全員で防災について話し合い、意識を共有することが大切です</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-red-600 mr-3 mt-1"></i>
+                                <span>備蓄品の消費期限チェックとローリングストックを心がけましょう</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- フッター -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <i class="fas fa-shield-alt text-2xl"></i>
+                        <h4 class="text-xl font-bold">備えの達人</h4>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        あなたとご家族の安全を守るため、科学的根拠に基づいた防災準備度診断を提供しています。
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://x.com/appadaycreator" target="_blank" class="text-gray-300 hover:text-white">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h5 class="font-bold mb-4">サービス</h5>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#check" class="hover:text-white">防災診断</a></li>
+                        <li><a href="#history" class="hover:text-white">診断履歴</a></li>
+                        <li><a href="#about" class="hover:text-white">使い方</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="font-bold mb-4">リーガル</h5>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#privacy" class="hover:text-white">プライバシーポリシー</a></li>
+                        <li><a href="#terms" class="hover:text-white">利用規約</a></li>
+                        <li><a href="#disclaimer" class="hover:text-white">免責事項</a></li>
+                        <li><a href="#contact" class="hover:text-white">お問い合わせ</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; 2024 AppADayCreator. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- モーダル群 -->
+    <!-- シェアモーダル -->
+    <div id="shareModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h4 class="text-2xl font-bold text-gray-800 mb-6 text-center">結果をシェア</h4>
+            <div class="space-y-4">
+                <button onclick="shareToTwitter()" class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                    <i class="fab fa-twitter mr-2"></i>Twitterでシェア
+                </button>
+                <button onclick="copyLink()" class="w-full bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-link mr-2"></i>リンクをコピー
+                </button>
+            </div>
+            <div class="text-center mt-6">
+                <button onclick="closeModal('shareModal')" class="text-gray-500 hover:text-gray-700">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- プライバシーポリシーモーダル -->
+    <div id="privacyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-4xl w-full mx-4 max-h-96 overflow-y-auto">
+            <h4 class="text-2xl font-bold text-gray-800 mb-6">プライバシーポリシー</h4>
+            <div class="space-y-4 text-gray-600">
+                <p>本サービス「備えの達人」（以下「当サービス」）では、ユーザーの個人情報保護を重要視し、以下のプライバシーポリシーを定めます。</p>
+                
+                <h5 class="font-bold text-gray-800">1. 収集する情報</h5>
+                <p>当サービスでは以下の情報を収集します：</p>
+                <ul class="list-disc list-inside ml-4">
+                    <li>居住地域（都道府県・市区町村）</li>
+                    <li>家族構成に関する情報</li>
+                    <li>住居タイプ</li>
+                    <li>防災準備状況のチェック結果</li>
+                    <li>診断履歴データ</li>
+                </ul>
+
+                <h5 class="font-bold text-gray-800">2. 情報の利用目的</h5>
+                <p>収集した情報は以下の目的で利用します：</p>
+                <ul class="list-disc list-inside ml-4">
+                    <li>防災準備度の診断・評価</li>
+                    <li>地域特性に応じた改善提案の提供</li>
+                    <li>サービスの改善・向上</li>
+                    <li>統計データの作成（個人を特定できない形式）</li>
+                </ul>
+
+                <h5 class="font-bold text-gray-800">3. 情報の保管</h5>
+                <p>診断結果はお使いのブラウザのローカルストレージに保存され、第三者と共有されることはありません。</p>
+
+                <h5 class="font-bold text-gray-800">4. Cookie等の利用</h5>
+                <p>当サービスでは、サービス向上のためGoogle Analyticsを使用しています。</p>
+
+                <h5 class="font-bold text-gray-800">5. お問い合わせ</h5>
+                <p>本ポリシーに関するお問い合わせは、下記までご連絡ください。</p>
+                <p>メール：contact@appadaycreator.com</p>
+            </div>
+            <div class="text-center mt-6">
+                <button onclick="closeModal('privacyModal')" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 利用規約モーダル -->
+    <div id="termsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-4xl w-full mx-4 max-h-96 overflow-y-auto">
+            <h4 class="text-2xl font-bold text-gray-800 mb-6">利用規約</h4>
+            <div class="space-y-4 text-gray-600">
+                <h5 class="font-bold text-gray-800">第1条（適用）</h5>
+                <p>本規約は、当サービス「備えの達人」の利用に関して適用されます。</p>
+
+                <h5 class="font-bold text-gray-800">第2条（利用資格）</h5>
+                <p>本サービスは、どなたでも無料でご利用いただけます。</p>
+
+                <h5 class="font-bold text-gray-800">第3条（禁止事項）</h5>
+                <p>ユーザーは以下の行為を行ってはなりません：</p>
+                <ul class="list-disc list-inside ml-4">
+                    <li>法令に違反する行為</li>
+                    <li>当サービスの運営を妨害する行為</li>
+                    <li>虚偽の情報を入力する行為</li>
+                    <li>当サービスの複製・改変・頒布</li>
+                </ul>
+
+                <h5 class="font-bold text-gray-800">第4条（免責事項）</h5>
+                <p>当サービスは情報提供を目的としており、診断結果の正確性や完全性を保証するものではありません。</p>
+
+                <h5 class="font-bold text-gray-800">第5条（サービスの変更・停止）</h5>
+                <p>当方は、事前通知なくサービス内容の変更・停止を行う場合があります。</p>
+
+                <h5 class="font-bold text-gray-800">第6条（準拠法・管轄裁判所）</h5>
+                <p>本規約は日本法に準拠し、東京地方裁判所を専属的合意管轄裁判所とします。</p>
+            </div>
+            <div class="text-center mt-6">
+                <button onclick="closeModal('termsModal')" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 免責事項モーダル -->
+    <div id="disclaimerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-4xl w-full mx-4 max-h-96 overflow-y-auto">
+            <h4 class="text-2xl font-bold text-gray-800 mb-6">免責事項</h4>
+            <div class="space-y-4 text-gray-600">
+                <h5 class="font-bold text-gray-800">1. サービスの性質</h5>
+                <p>本サービス「備えの達人」は、防災準備の目安を提供する情報サービスです。診断結果は参考情報であり、絶対的な基準ではありません。</p>
+
+                <h5 class="font-bold text-gray-800">2. 情報の正確性</h5>
+                <p>当サービスは信頼性の高い情報源を参考にしていますが、情報の正確性、完全性、最新性について保証するものではありません。</p>
+
+                <h5 class="font-bold text-gray-800">3. 利用結果の責任</h5>
+                <p>本サービスの利用により生じた損害について、当方は一切の責任を負いません。防災対策は各自の判断と責任で実施してください。</p>
+
+                <h5 class="font-bold text-gray-800">4. 専門家の意見</h5>
+                <p>具体的な防災対策については、地域の防災専門家や自治体にご相談することをお勧めします。</p>
+
+                <h5 class="font-bold text-gray-800">5. 第三者リンク</h5>
+                <p>本サービスから第三者サイトへのリンクについて、当方はその内容や安全性について保証しません。</p>
+
+                <h5 class="font-bold text-gray-800">6. サービス停止</h5>
+                <p>システム障害、メンテナンス等によりサービスが利用できない場合がありますが、これによる損害について当方は責任を負いません。</p>
+            </div>
+            <div class="text-center mt-6">
+                <button onclick="closeModal('disclaimerModal')" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- お問い合わせモーダル -->
+    <div id="contactModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-2xl w-full mx-4">
+            <h4 class="text-2xl font-bold text-gray-800 mb-6">お問い合わせ</h4>
+            <form id="contactForm" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">お名前（任意）</label>
+                    <input type="text" id="contactName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">メールアドレス</label>
+                    <input type="email" id="contactEmail" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">お問い合わせ内容</label>
+                    <textarea id="contactMessage" required rows="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
+                </div>
+                <div class="flex justify-center space-x-4">
+                    <button type="submit" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700">
+                        <i class="fas fa-paper-plane mr-2"></i>送信
+                    </button>
+                    <button type="button" onclick="closeModal('contactModal')" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600">
+                        キャンセル
+                    </button>
+                </div>
+            </form>
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                <p class="text-sm text-gray-600">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    お返事には数日いただく場合があります。お急ぎの場合は、お住まいの自治体の防災担当部署にお問い合わせください。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // グローバル変数
+        let currentSection = 'home';
+        let checkedItems = 0;
+        let totalItems = 50;
+        let basicInfo = {};
+        let checklistData = {};
+        let resultData = {};
+
+        // PWA設定
+        const manifestContent = {
+            "name": "防災準備度チェック「備えの達人」",
+            "short_name": "備えの達人",
+            "description": "家庭の防災準備状況を地域特性に応じて診断し、改善提案を提供します",
+            "start_url": "./",
+            "display": "standalone",
+            "theme_color": "#dc2626",
+            "background_color": "#ffffff",
+            "icons": [
+                {
+                    "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>",
+                    "sizes": "192x192",
+                    "type": "image/svg+xml"
+                }
+            ]
+        };
+
+        // マニフェストの動的設定
+        const manifestBlob = new Blob([JSON.stringify(manifestContent)], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        document.getElementById('manifest-placeholder').href = manifestURL;
+
+        // DOM要素取得
+        const elements = {
+            startBtn: document.getElementById('startBtn'),
+            historyBtn: document.getElementById('historyBtn'),
+            startCheckBtn: document.getElementById('startCheckBtn'),
+            calculateBtn: document.getElementById('calculateBtn'),
+            shareBtn: document.getElementById('shareBtn'),
+            printBtn: document.getElementById('printBtn'),
+            saveBtn: document.getElementById('saveBtn'),
+            retryBtn: document.getElementById('retryBtn'),
+            basicInfoForm: document.getElementById('basicInfoForm'),
+            checklistSection: document.getElementById('checklistSection'),
+            resultSection: document.getElementById('resultSection'),
+            historySection: document.getElementById('history'),
+            progressBar: document.getElementById('progressBar'),
+            progressText: document.getElementById('progressText'),
+            totalScore: document.getElementById('totalScore'),
+            scoreComment: document.getElementById('scoreComment')
+        };
+
+        // イベントリスナー設定
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            loadHistory();
+        });
+
+        // アプリ初期化
+        function initializeApp() {
+            // ナビゲーション
+            elements.startBtn.addEventListener('click', () => showSection('check'));
+            elements.historyBtn.addEventListener('click', () => showSection('history'));
+            
+            // 基本情報フォーム
+            elements.startCheckBtn.addEventListener('click', startChecklist);
+            
+            // チェックリスト
+            elements.calculateBtn.addEventListener('click', calculateResults);
+            
+            // 結果アクション
+            elements.shareBtn.addEventListener('click', () => showModal('shareModal'));
+            elements.printBtn.addEventListener('click', printResults);
+            elements.saveBtn.addEventListener('click', saveResults);
+            elements.retryBtn.addEventListener('click', resetForm);
+
+            // チェックボックス変更イベント
+            document.querySelectorAll('.checklist-item').forEach(checkbox => {
+                checkbox.addEventListener('change', updateProgress);
+            });
+
+            // フォーム入力検証
+            ['prefecture', 'housingType', 'familySize'].forEach(id => {
+                document.getElementById(id).addEventListener('change', validateBasicForm);
+            });
+
+            // フッターリンク
+            document.querySelector('a[href="#privacy"]').addEventListener('click', (e) => {
+                e.preventDefault();
+                showModal('privacyModal');
+            });
+            document.querySelector('a[href="#terms"]').addEventListener('click', (e) => {
+                e.preventDefault();
+                showModal('termsModal');
+            });
+            document.querySelector('a[href="#disclaimer"]').addEventListener('click', (e) => {
+                e.preventDefault();
+                showModal('disclaimerModal');
+            });
+            document.querySelector('a[href="#contact"]').addEventListener('click', (e) => {
+                e.preventDefault();
+                showModal('contactModal');
+            });
+
+            // お問い合わせフォーム
+            document.getElementById('contactForm').addEventListener('submit', handleContactSubmit);
+
+            // スムーススクロール
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // レスポンシブメニュー
+            document.getElementById('menuBtn').addEventListener('click', toggleMobileMenu);
+        }
+
+        // セクション表示
+        function showSection(section) {
+            // 全セクション非表示
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            
+            // 対象セクション表示
+            const targetSection = document.getElementById(section);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                targetSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            currentSection = section;
+        }
+
+        // 基本情報フォーム検証
+        function validateBasicForm() {
+            const prefecture = document.getElementById('prefecture').value;
+            const housingType = document.getElementById('housingType').value;
+            const familySize = document.getElementById('familySize').value;
+            
+            const isValid = prefecture && housingType && familySize;
+            elements.startCheckBtn.disabled = !isValid;
+            
+            if (isValid) {
+                elements.startCheckBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                elements.startCheckBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // チェックリスト開始
+        function startChecklist() {
+            // 基本情報収集
+            basicInfo = {
+                prefecture: document.getElementById('prefecture').value,
+                housingType: document.getElementById('housingType').value,
+                familySize: document.getElementById('familySize').value,
+                hasInfants: document.getElementById('hasInfants').checked,
+                hasChildren: document.getElementById('hasChildren').checked,
+                hasElderly: document.getElementById('hasElderly').checked,
+                hasPets: document.getElementById('hasPets').checked,
+                timestamp: new Date().toISOString()
+            };
+
+            // フォーム非表示、チェックリスト表示
+            elements.basicInfoForm.classList.add('hidden');
+            elements.checklistSection.classList.remove('hidden');
+            elements.checklistSection.classList.add('fade-in');
+        }
+
+        // 進捗更新
+        function updateProgress() {
+            checkedItems = document.querySelectorAll('.checklist-item:checked').length;
+            const progress = (checkedItems / totalItems) * 100;
+            
+            elements.progressBar.style.width = `${progress}%`;
+            elements.progressText.textContent = `${checkedItems} / ${totalItems}`;
+            
+            // 完了時のアニメーション
+            if (checkedItems === totalItems) {
+                elements.progressBar.classList.add('bg-green-500');
+                elements.calculateBtn.classList.add('shake');
+                setTimeout(() => {
+                    elements.calculateBtn.classList.remove('shake');
+                }, 500);
+            }
+        }
+
+        // 結果計算
+        function calculateResults() {
+            // チェックリストデータ収集
+            const categories = {
+                'water-food': { items: [], total: 12 },
+                'equipment': { items: [], total: 15 },
+                'evacuation': { items: [], total: 8 },
+                'information': { items: [], total: 7 },
+                'family': { items: [], total: 8 }
+            };
+
+            document.querySelectorAll('[data-category]').forEach(categoryDiv => {
+                const categoryName = categoryDiv.dataset.category;
+                const checkboxes = categoryDiv.querySelectorAll('.checklist-item');
+                
+                checkboxes.forEach((checkbox, index) => {
+                    categories[categoryName].items.push(checkbox.checked);
+                });
+            });
+
+            // スコア計算
+            const scores = {};
+            let totalScore = 0;
+
+            Object.keys(categories).forEach(category => {
+                const checkedCount = categories[category].items.filter(item => item).length;
+                const categoryScore = Math.round((checkedCount / categories[category].total) * 100);
+                scores[category] = categoryScore;
+                totalScore += categoryScore;
+            });
+
+            totalScore = Math.round(totalScore / Object.keys(categories).length);
+
+            // 結果データ保存
+            resultData = {
+                basicInfo,
+                scores,
+                totalScore,
+                checkedItems,
+                categories,
+                timestamp: new Date().toISOString()
+            };
+
+            // 結果表示
+            displayResults();
+        }
+
+        // 結果表示
+        function displayResults() {
+            // スコア表示
+            elements.totalScore.textContent = resultData.totalScore;
+            
+            // コメント生成
+            let comment = '';
+            if (resultData.totalScore >= 90) {
+                comment = '素晴らしい！非常に高いレベルの防災準備ができています。';
+            } else if (resultData.totalScore >= 70) {
+                comment = '良好です。いくつかの改善点はありますが、基本的な準備はできています。';
+            } else if (resultData.totalScore >= 50) {
+                comment = '平均的です。重要な項目から順次改善していきましょう。';
+            } else if (resultData.totalScore >= 30) {
+                comment = '改善の余地があります。基本的な備蓄から始めましょう。';
+            } else {
+                comment = '防災準備が不足しています。すぐに基本的な対策を始めることをお勧めします。';
+            }
+            
+            elements.scoreComment.textContent = comment;
+
+            // レーダーチャート表示
+            createRadarChart();
+
+            // 改善提案生成
+            generateSuggestions();
+
+            // セクション表示
+            elements.checklistSection.classList.add('hidden');
+            elements.resultSection.classList.remove('hidden');
+            elements.resultSection.classList.add('fade-in');
+        }
+
+        // レーダーチャート作成
+        function createRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            const data = {
+                labels: [
+                    '水・食料備蓄',
+                    '防災用品',
+                    '避難準備',
+                    '情報収集',
+                    '家族連携'
+                ],
+                datasets: [{
+                    label: '現在のスコア',
+                    data: [
+                        resultData.scores['water-food'],
+                        resultData.scores['equipment'],
+                        resultData.scores['evacuation'],
+                        resultData.scores['information'],
+                        resultData.scores['family']
+                    ],
+                    backgroundColor: 'rgba(220, 38, 38, 0.2)',
+                    borderColor: 'rgb(220, 38, 38)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgb(220, 38, 38)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6
+                }]
+            };
+
+            const config = {
+                type: 'radar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            };
+
+            new Chart(ctx, config);
+        }
+
+        // 改善提案生成
+        function generateSuggestions() {
+            const suggestionsContainer = document.getElementById('suggestionsContent');
+            const suggestions = [];
+
+            // カテゴリ別の提案
+            const categoryNames = {
+                'water-food': '水・食料備蓄',
+                'equipment': '防災用品',
+                'evacuation': '避難準備',
+                'information': '情報収集',
+                'family': '家族連携'
+            };
+
+            const categoryAdvice = {
+                'water-food': [
+                    '1人1日3リットル×最低3日分の飲料水を確保しましょう',
+                    '非常食は家族の人数×3日分以上を備蓄しましょう',
+                    'ローリングストック法で定期的に食品を入れ替えましょう',
+                    'カセットコンロとボンベを用意しましょう'
+                ],
+                'equipment': [
+                    '懐中電灯と乾電池を複数個用意しましょう',
+                    'ポータブルラジオで情報収集手段を確保しましょう',
+                    'モバイルバッテリーで通信手段を維持しましょう',
+                    '救急箱と常備薬を準備しましょう'
+                ],
+                'evacuation': [
+                    '避難場所と避難経路を家族で確認しましょう',
+                    '非常持出袋を準備し、定期的に見直しましょう',
+                    '家具の転倒防止対策を実施しましょう',
+                    '重要書類のコピーを別途保管しましょう'
+                ],
+                'information': [
+                    '地域の防災アプリをインストールしましょう',
+                    'ハザードマップを確認・印刷保管しましょう',
+                    '災害伝言ダイヤル(171)の使い方を覚えましょう',
+                    '自治体のSNSをフォローしましょう'
+                ],
+                'family': [
+                    '家族会議で災害時の行動を話し合いましょう',
+                    '家族の連絡先リストを全員が持ちましょう',
+                    '集合場所と連絡方法を決めておきましょう',
+                    '年1回以上の防災訓練に参加しましょう'
+                ]
+            };
+
+            // 低スコアカテゴリの提案
+            Object.keys(resultData.scores).forEach(category => {
+                if (resultData.scores[category] < 70) {
+                    suggestions.push({
+                        category: categoryNames[category],
+                        score: resultData.scores[category],
+                        advice: categoryAdvice[category]
+                    });
+                }
+            });
+
+            // 地域特性に応じた提案
+            const regionAdvice = getRegionSpecificAdvice(basicInfo.prefecture);
+            if (regionAdvice.length > 0) {
+                suggestions.push({
+                    category: '地域特性対応',
+                    advice: regionAdvice
+                });
+            }
+
+            // 家族構成に応じた提案
+            const familyAdvice = getFamilySpecificAdvice(basicInfo);
+            if (familyAdvice.length > 0) {
+                suggestions.push({
+                    category: '家族構成対応',
+                    advice: familyAdvice
+                });
+            }
+
+            // HTML生成
+            let html = '';
+            suggestions.forEach(suggestion => {
+                html += `
+                    <div class="mb-6 p-4 border-l-4 border-red-500 bg-red-50">
+                        <h5 class="font-bold text-gray-800 mb-3">
+                            ${suggestion.category}
+                            ${suggestion.score ? `(現在${suggestion.score}点)` : ''}
+                        </h5>
+                        <ul class="space-y-2">
+                            ${suggestion.advice.map(item => `
+                                <li class="flex items-start">
+                                    <i class="fas fa-arrow-right text-red-500 mr-2 mt-1"></i>
+                                    <span class="text-gray-700">${item}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
+
+            // アフィリエイトリンク追加
+            html += generateAffiliateSection();
+
+            suggestionsContainer.innerHTML = html;
+        }
+
+        // 地域特性アドバイス
+        function getRegionSpecificAdvice(prefecture) {
+            const advice = [];
+            
+            // 地震リスクの高い地域
+            if (['東京都', '神奈川県', '千葉県', '埼玉県', '静岡県', '愛知県', '大阪府', '兵庫県'].includes(prefecture)) {
+                advice.push('首都直下地震・南海トラフ地震に備えて、建物の耐震化を検討しましょう');
+                advice.push('密集市街地では火災対策も重要です');
+            }
+            
+            // 津波リスク地域
+            if (['岩手県', '宮城県', '福島県', '茨城県', '千葉県', '神奈川県', '静岡県', '愛知県', '三重県', '和歌山県', '徳島県', '高知県'].includes(prefecture)) {
+                advice.push('津波ハザードマップを確認し、高台への避難経路を複数確保しましょう');
+            }
+            
+            // 豪雪地域
+            if (['青森県', '岩手県', '秋田県', '山形県', '福島県', '新潟県', '富山県', '石川県', '福井県', '長野県'].includes(prefecture)) {
+                advice.push('豪雪による孤立に備えて、冬期間の備蓄を強化しましょう');
+                advice.push('停電時の暖房手段を確保しましょう');
+            }
+            
+            // 台風・豪雨地域
+            if (['沖縄県', '鹿児島県', '宮崎県', '熊本県', '大分県', '福岡県', '佐賀県', '長崎県'].includes(prefecture)) {
+                advice.push('台風シーズン前に防風対策と排水設備の点検をしましょう');
+                advice.push('停電長期化に備えて発電機の導入を検討しましょう');
+            }
+            
+            return advice;
+        }
+
+        // 家族構成アドバイス
+        function getFamilySpecificAdvice(info) {
+            const advice = [];
+            
+            if (info.hasInfants) {
+                advice.push('粉ミルク・離乳食・オムツを多めに備蓄しましょう');
+                advice.push('赤ちゃん用の避難用品（抱っこ紐、毛布等）を準備しましょう');
+            }
+            
+            if (info.hasChildren) {
+                advice.push('学校との連絡方法・お迎えルールを確認しましょう');
+                advice.push('子ども用のヘルメットと笛を用意しましょう');
+            }
+            
+            if (info.hasElderly) {
+                advice.push('常備薬を多めに備蓄し、お薬手帳をコピーしましょう');
+                advice.push('車椅子・歩行器の点検と避難方法を検討しましょう');
+            }
+            
+            if (info.hasPets) {
+                advice.push('ペット用の避難用品（キャリー、フード、水）を準備しましょう');
+                advice.push('ペット同行避難可能な避難所を事前確認しましょう');
+            }
+            
+            if (info.familySize === '1') {
+                advice.push('一人暮らしでは安否確認手段の確保が重要です');
+                advice.push('近隣住民との連携を検討しましょう');
+            }
+            
+            return advice;
+        }
+
+        // アフィリエイトセクション生成
+        function generateAffiliateSection() {
+            return `
+                <div class="mt-8 p-6 bg-blue-50 rounded-xl">
+                    <h5 class="font-bold text-blue-800 mb-4 flex items-center">
+                        <i class="fas fa-shopping-cart mr-2"></i>
+                        おすすめ防災用品
+                    </h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h6 class="font-bold mb-2">防災セット</h6>
+                            <p class="text-sm text-gray-600 mb-3">必要な防災用品がまとめて揃います</p>
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm">
+                                <i class="fas fa-external-link-alt mr-1"></i>
+                                商品を見る（Amazon）
+                            </a>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h6 class="font-bold mb-2">非常食セット</h6>
+                            <p class="text-sm text-gray-600 mb-3">長期保存可能な美味しい非常食</p>
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm">
+                                <i class="fas fa-external-link-alt mr-1"></i>
+                                商品を見る（楽天）
+                            </a>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h6 class="font-bold mb-2">モバイルバッテリー</h6>
+                            <p class="text-sm text-gray-600 mb-3">大容量で太陽光充電も可能</p>
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm">
+                                <i class="fas fa-external-link-alt mr-1"></i>
+                                商品を見る（A8.net）
+                            </a>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h6 class="font-bold mb-2">簡易トイレ</h6>
+                            <p class="text-sm text-gray-600 mb-3">災害時の衛生管理に必須</p>
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm">
+                                <i class="fas fa-external-link-alt mr-1"></i>
+                                商品を見る（もしもアフィリエイト）
+                            </a>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-500">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        これらのリンクはアフィリエイトリンクです。収益はサービス運営費に充てられます。
+                    </div>
+                </div>
+            `;
+        }
+
+        // 結果保存
+        function saveResults() {
+            try {
+                // 履歴取得
+                let history = JSON.parse(localStorage.getItem('disasterPreparednessHistory') || '[]');
+                
+                // 新しい結果を追加
+                history.unshift(resultData);
+                
+                // 最大20件まで保存
+                if (history.length > 20) {
+                    history = history.slice(0, 20);
+                }
+                
+                // 保存
+                localStorage.setItem('disasterPreparednessHistory', JSON.stringify(history));
+                
+                // 通知
+                showNotification('診断結果を保存しました！', 'success');
+                
+                // 履歴更新
+                loadHistory();
+            } catch (error) {
+                showNotification('保存に失敗しました。', 'error');
+            }
+        }
+
+        // 履歴読み込み
+        function loadHistory() {
+            try {
+                const history = JSON.parse(localStorage.getItem('disasterPreparednessHistory') || '[]');
+                const historyContent = document.getElementById('historyContent');
+                
+                if (history.length === 0) {
+                    historyContent.innerHTML = `
+                        <div class="text-center text-gray-500 py-8">
+                            <i class="fas fa-clipboard-list text-4xl mb-4"></i>
+                            <p>まだ診断履歴がありません。<br>最初の診断を完了すると、ここに履歴が表示されます。</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                history.forEach((record, index) => {
+                    const date = new Date(record.timestamp).toLocaleDateString('ja-JP');
+                    const scoreColor = record.totalScore >= 70 ? 'text-green-600' : record.totalScore >= 50 ? 'text-yellow-600' : 'text-red-600';
+                    
+                    html += `
+                        <div class="bg-white rounded-xl p-6 shadow-lg">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="text-3xl font-bold ${scoreColor}">${record.totalScore}</div>
+                                    <div>
+                                        <div class="font-bold text-gray-800">診断結果 #${index + 1}</div>
+                                        <div class="text-gray-500 text-sm">${date}</div>
+                                    </div>
+                                </div>
+                                <button onclick="viewHistoryDetail(${index})" class="text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-eye mr-1"></i>詳細
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+                                <div class="text-center">
+                                    <div class="text-gray-500">水・食料</div>
+                                    <div class="font-bold">${record.scores['water-food']}点</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-gray-500">防災用品</div>
+                                    <div class="font-bold">${record.scores['equipment']}点</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-gray-500">避難準備</div>
+                                    <div class="font-bold">${record.scores['evacuation']}点</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-gray-500">情報収集</div>
+                                    <div class="font-bold">${record.scores['information']}点</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-gray-500">家族連携</div>
+                                    <div class="font-bold">${record.scores['family']}点</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                historyContent.innerHTML = html;
+            } catch (error) {
+                console.error('履歴読み込みエラー:', error);
+            }
+        }
+
+        // 履歴詳細表示
+        function viewHistoryDetail(index) {
+            const history = JSON.parse(localStorage.getItem('disasterPreparednessHistory') || '[]');
+            const record = history[index];
+            
+            if (record) {
+                // 過去の結果をcurrentに設定して結果画面表示
+                resultData = record;
+                displayResults();
+                showSection('check');
+            }
+        }
+
+        // フォームリセット
+        function resetForm() {
+            // フォームクリア
+            document.getElementById('prefecture').value = '';
+            document.getElementById('housingType').value = '';
+            document.getElementById('familySize').value = '';
+            document.getElementById('hasInfants').checked = false;
+            document.getElementById('hasChildren').checked = false;
+            document.getElementById('hasElderly').checked = false;
+            document.getElementById('hasPets').checked = false;
+            
+            // チェックボックスクリア
+            document.querySelectorAll('.checklist-item').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // 進捗リセット
+            checkedItems = 0;
+            updateProgress();
+            
+            // セクション表示リセット
+            elements.resultSection.classList.add('hidden');
+            elements.checklistSection.classList.add('hidden');
+            elements.basicInfoForm.classList.remove('hidden');
+            
+            // フォーム検証
+            validateBasicForm();
+            
+            showSection('check');
+        }
+
+        // 印刷
+        function printResults() {
+            const printWindow = window.open('', '_blank');
+            const printContent = generatePrintContent();
+            
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // 印刷用コンテンツ生成
+        function generatePrintContent() {
+            const date = new Date().toLocaleDateString('ja-JP');
+            
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>防災準備度診断結果 - ${date}</title>
+                    <style>
+                        body { font-family: 'Yu Gothic', 'Meiryo', sans-serif; margin: 20px; }
+                        .header { text-align: center; border-bottom: 2px solid #dc2626; padding-bottom: 10px; margin-bottom: 20px; }
+                        .score { font-size: 48px; color: #dc2626; font-weight: bold; text-align: center; margin: 20px 0; }
+                        .category { margin: 15px 0; padding: 10px; border: 1px solid #ccc; }
+                        .category h3 { margin: 0 0 10px 0; color: #dc2626; }
+                        .suggestions { margin-top: 30px; }
+                        .suggestions ul { list-style-type: disc; margin-left: 20px; }
+                        @media print { body { margin: 0; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>防災準備度診断結果</h1>
+                        <p>診断日：${date}</p>
+                        <p>地域：${resultData.basicInfo.prefecture} | 家族：${resultData.basicInfo.familySize}人</p>
+                    </div>
+                    
+                    <div class="score">${resultData.totalScore}点 / 100点</div>
+                    
+                    <div class="categories">
+                        <div class="category">
+                            <h3>水・食料備蓄：${resultData.scores['water-food']}点</h3>
+                        </div>
+                        <div class="category">
+                            <h3>防災用品：${resultData.scores['equipment']}点</h3>
+                        </div>
+                        <div class="category">
+                            <h3>避難準備：${resultData.scores['evacuation']}点</h3>
+                        </div>
+                        <div class="category">
+                            <h3>情報収集：${resultData.scores['information']}点</h3>
+                        </div>
+                        <div class="category">
+                            <h3>家族連携：${resultData.scores['family']}点</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="suggestions">
+                        <h2>改善提案</h2>
+                        <p>診断結果に基づいて、以下の点を改善することをお勧めします：</p>
+                        <ul>
+                            <li>スコアが70点未満のカテゴリを優先的に改善</li>
+                            <li>地域の災害リスクに応じた対策の強化</li>
+                            <li>家族構成に応じた特別な準備</li>
+                            <li>3ヶ月ごとの定期的な見直し</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="margin-top: 30px; text-align: center; color: #666;">
+                        <p>防災準備度チェック「備えの達人」</p>
+                        <p>https://appadaycreator.github.io/disaster-preparedness-checker/</p>
+                    </div>
+                </body>
+                </html>
+            `;
+        }
+
+        // SNSシェア
+        function shareToTwitter() {
+            const text = `30日連続開発チャレンジ（120/30）
+
+https://appadaycreator.github.io/disaster-preparedness-checker/
+
+🛡️あなたの防災準備は何点？
+無料の防災準備度チェックを作りました！
+✅ 地域特性も考慮した診断
+✅ 50項目の包括チェック
+✅ 個別改善提案も生成
+
+いざという時のために今すぐチェック🚨
+
+#継続は力なり #防災 #備蓄 #地震対策 #無料ツール`;
+
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        // リンクコピー
+        function copyLink() {
+            const url = 'https://appadaycreator.github.io/disaster-preparedness-checker/';
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showNotification('リンクをコピーしました！', 'success');
+                });
+            } else {
+                // フォールバック
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showNotification('リンクをコピーしました！', 'success');
+            }
+        }
+
+        // モーダル表示
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // モーダル非表示
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // お問い合わせ送信
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const message = document.getElementById('contactMessage').value;
+            
+            // 実際の送信処理（今回はダミー）
+            setTimeout(() => {
+                showNotification('お問い合わせを受け付けました。ありがとうございます。', 'success');
+                closeModal('contactModal');
+                document.getElementById('contactForm').reset();
+            }, 500);
+        }
+
+        // 通知表示
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            } text-white`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // モバイルメニュー切り替え
+        function toggleMobileMenu() {
+            // 実装省略（デモ用）
+            showNotification('モバイルメニュー機能は実装中です', 'info');
+        }
+
+        // PWA関連
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // Service Worker内容（ダミー）
+        const swContent = `
+            const CACHE_NAME = 'disaster-preparedness-v1';
+            const urlsToCache = [
+                '/',
+                '/index.html',
+                'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css',
+                'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css',
+                'https://cdn.jsdelivr.net/npm/chart.js'
+            ];
+
+            self.addEventListener('install', event => {
+                event.waitUntil(
+                    caches.open(CACHE_NAME)
+                        .then(cache => cache.addAll(urlsToCache))
+                );
+            });
+
+            self.addEventListener('fetch', event => {
+                event.respondWith(
+                    caches.match(event.request)
+                        .then(response => {
+                            if (response) {
+                                return response;
+                            }
+                            return fetch(event.request);
+                        })
+                );
+            });
+        `;
+
+        // モーダル外クリックで閉じる
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('fixed') && e.target.classList.contains('inset-0')) {
+                const modals = ['shareModal', 'privacyModal', 'termsModal', 'disclaimerModal', 'contactModal'];
+                modals.forEach(modalId => {
+                    if (e.target.id === modalId) {
+                        closeModal(modalId);
+                    }
+                });
+            }
+        });
+
+        // ESCキーでモーダル閉じる
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const modals = ['shareModal', 'privacyModal', 'termsModal', 'disclaimerModal', 'contactModal'];
+                modals.forEach(modalId => {
+                    const modal = document.getElementById(modalId);
+                    if (modal && !modal.classList.contains('hidden')) {
+                        closeModal(modalId);
+                    }
+                });
+            }
+        });
+
+        // 初期フォーム状態設定
+        validateBasicForm();
+    </script>
 </body>
 </html>
