@@ -1,10 +1,11 @@
 {
-  "name": "防災チェックアプリ",
-  "short_name": "防災チェック",
-  "start_url": ".",
+  "name": "防災準備度チェック「備えの達人」",
+  "short_name": "備えの達人",
+  "description": "家庭の防災準備状況を地域特性に応じて診断",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#1976d2",
+  "theme_color": "#1e40af",
   "icons": [
     {
       "src": "icons/icon-192x192.png",
