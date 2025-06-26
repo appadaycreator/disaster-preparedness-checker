@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://appadaycreator.github.io/disaster-preparedness-checker/sitemap.xml
