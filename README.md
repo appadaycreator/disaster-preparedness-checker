@@ -8,6 +8,7 @@
 
 ## ファイル構成
 - `index.html` - メインページ
+- `app.js` - 主要な JavaScript ロジック
 - `manifest.json` - PWA 設定ファイル
 
 ## 解析ツール

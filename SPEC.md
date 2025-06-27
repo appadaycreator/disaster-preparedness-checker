@@ -3,6 +3,7 @@
 このアプリは以下のファイルで構成されています。
 
 - **index.html**: ユーザーインターフェースを提供するHTMLファイル。
+- **app.js**: アプリの主要ロジックをまとめたJavaScript。
 - **manifest.json**: PWA用の設定ファイル。
 - Google Tag Manager を用いたアクセス解析。
 
