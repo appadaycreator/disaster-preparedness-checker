@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>免責事項 - 備えの達人</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans JP', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <header class="gradient-bg shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-shield-alt text-white text-2xl"></i>
+                <h1 class="text-white text-xl font-bold">備えの達人</h1>
+            </div>
+            <nav class="space-x-6 hidden md:flex">
+                <a href="index.html#home" class="text-white hover:text-red-200">ホーム</a>
+                <a href="index.html#check" class="text-white hover:text-red-200">診断開始</a>
+                <a href="index.html#about" class="text-white hover:text-red-200">使い方</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12 space-y-8">
+        <h2 class="text-2xl font-bold mb-6">免責事項</h2>
+        <section class="space-y-4 text-gray-700">
+            <h3 class="font-bold">1. サービスの性質</h3>
+            <p>本サービスで提供する診断結果は、一般的な防災情報をもとにした参考値です。地域の実情や個別事情によっては当てはまらない場合があります。</p>
+            <h3 class="font-bold">2. 情報の正確性</h3>
+            <p>掲載内容の正確性や最新性については万全を期していますが、保証するものではありません。</p>
+            <h3 class="font-bold">3. 責任の範囲</h3>
+            <p>本サービスの利用により生じたいかなる損害に対しても、当方は責任を負いません。各自の判断で防災対策を行ってください。</p>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <i class="fas fa-shield-alt text-2xl"></i>
+                        <h4 class="text-xl font-bold">備えの達人</h4>
+                    </div>
+                    <p class="text-gray-300 mb-4">科学的根拠に基づいた防災準備度診断を提供しています。</p>
+                </div>
+                <div>
+                    <h5 class="font-bold mb-4">リーガル</h5>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="privacy.html" class="hover:text-white">プライバシーポリシー</a></li>
+                        <li><a href="disclaimer.html" class="hover:text-white">免責事項</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; 2024 AppADayCreator. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
