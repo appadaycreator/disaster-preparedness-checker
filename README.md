@@ -5,9 +5,13 @@
 ## 使い方
 1. 本リポジトリをクローンまたはダウンロードします。
 2. `index.html` をブラウザで開きます。
+3. フッターのリンクから詳細な使い方や各種ポリシーを確認できます。
 
 ## ファイル構成
 - `index.html` - メインページ
+- `usage.html` - 詳細な使い方ページ
+- `privacy.html` - プライバシーポリシー
+- `disclaimer.html` - 免責事項
 - `app.js` - 主要な JavaScript ロジック
 - `manifest.json` - PWA 設定ファイル
 
